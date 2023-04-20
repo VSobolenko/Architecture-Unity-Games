@@ -22,7 +22,6 @@ public class HeroMove : MonoBehaviour
     private void Start()
     {
         _camera = Camera.main;
-        _camera.GetComponent<CameraFollow>().Follow(gameObject);
     }
 
     private void Update()

@@ -438,6 +438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterController: {fileID: 176846125}
+  heroAnimator: {fileID: 176846128}
   movementSpeed: 4
 --- !u!114 &176846128
 MonoBehaviour:
@@ -451,7 +452,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b0228ff1ab541347a1711d9cecd8504, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  valueSet: 0
   animator: {fileID: 1435675671923270040}
   characterController: {fileID: 176846125}
 --- !u!1 &1435675671916007960
