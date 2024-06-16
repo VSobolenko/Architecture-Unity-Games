@@ -1,4 +1,5 @@
 using System;
+using Infrastructure.Services;
 using Services.Input;
 using UnityEngine;
 
@@ -10,16 +11,19 @@ public class BootstrapState : IState
     private const string Payload = "Main";
     private readonly GameStateMachine _stateMachine;
     private readonly SceneLoader _sceneLoader;
+    private readonly AllServices _services;
 
-    public BootstrapState(GameStateMachine stateMachine, SceneLoader sceneLoader)
+    public BootstrapState(GameStateMachine stateMachine, SceneLoader sceneLoader, AllServices services)
     {
         _stateMachine = stateMachine;
         _sceneLoader = sceneLoader;
+        _services = services;
+        
+        RegisterServices();
     }
 
     public void Enter()
     {
-        RegisterServices();
         _sceneLoader.Load(Initial, onLoaded: EnterLoadLevel);
     }
 
@@ -27,7 +31,10 @@ public class BootstrapState : IState
 
     private void RegisterServices()
     {
-        Game.inputService = RegisterInputService();
+        _services.RegisterSingle<IInputService>(InputService());
+        _services.RegisterSingle<IAssets>(new AssetProvider());
+        var asset = _services.Single<IAssets>();
+        _services.RegisterSingle<IGameFactory>(new GameFactory(asset));
     }
 
     public void Exit()
@@ -35,7 +42,7 @@ public class BootstrapState : IState
         
     }
     
-    private static IInputService RegisterInputService()
+    private static IInputService InputService()
     {
         if (Application.isEditor)
             return new StandaloneInputService();

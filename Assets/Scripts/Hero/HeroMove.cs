@@ -1,6 +1,7 @@
 using System;
 using CameraLogic;
 using Infrastructure;
+using Infrastructure.Services;
 using Services.Input;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ public class HeroMove : MonoBehaviour
 
     private void Awake()
     {
-        _inputService = Game.inputService;
+        _inputService = AllServices.Container.Single<IInputService>();
     }
 
     private void Start()
