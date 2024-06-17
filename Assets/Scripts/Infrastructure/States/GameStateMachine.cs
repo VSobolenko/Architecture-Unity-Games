@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using CodeBase.Logic;
 using Infrastructure.Services;
+using Infrastructure.Services.PersistentProgress;
+using UnityEngine;
 
 namespace Infrastructure
 {
@@ -15,7 +17,11 @@ public class GameStateMachine
         _states = new Dictionary<Type, IExitable>
         {
             [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader, services),
-            [typeof(LoadLevelState)] = new LoadLevelState(this, sceneLoader, loadingCurtain, services.Single<IGameFactory>()),
+            [typeof(LoadLevelState)] =
+                new LoadLevelState(this, sceneLoader, loadingCurtain, services.Single<IGameFactory>(),
+                                   services.Single<IPersistentProgressService>()),
+            [typeof(LoadProgressState)] = new LoadProgressState(this, services.Single<IPersistentProgressService>(),
+                                                                services.Single<ISaveLoadService>()),
             [typeof(GameLoopState)] = new GameLoopState(this),
         };
     }

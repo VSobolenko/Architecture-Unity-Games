@@ -1,13 +1,15 @@
 using System;
 using CameraLogic;
+using Data;
 using Infrastructure;
 using Infrastructure.Services;
 using Services.Input;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Hero
 {
-public class HeroMove : MonoBehaviour
+public class HeroMove : MonoBehaviour, ISavedProgress
 {
     public CharacterController characterController;
     public HeroAnimator heroAnimator;
@@ -49,5 +51,29 @@ public class HeroMove : MonoBehaviour
         if (characterController == null)
             characterController = GetComponent<CharacterController>();
     }
+
+    public void UpdateProgress(PlayerProgress progress)
+    {
+        progress.WorldData.positionOnLevel = new PositionOnLevel(CurrentLevel(), transform.position.AsVectorData());
+    }
+
+    public void LoadProgress(PlayerProgress progress)
+    {
+        if (CurrentLevel() == progress.WorldData.positionOnLevel.level)
+        {
+            var savedPosition = progress.WorldData.positionOnLevel.position;
+            if (savedPosition != null)
+                Warp(savedPosition);
+        }
+    }
+
+    private void Warp(Vector3Data to)
+    {
+        characterController.enabled = false;
+        transform.position = to.AsUnityVector().AddY(characterController.height);
+        characterController.enabled = true;
+    }
+
+    private static string CurrentLevel() => SceneManager.GetActiveScene().name;
 }
 }

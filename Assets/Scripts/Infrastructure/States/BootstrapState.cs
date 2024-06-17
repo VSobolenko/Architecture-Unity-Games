@@ -1,5 +1,6 @@
 using System;
 using Infrastructure.Services;
+using Infrastructure.Services.PersistentProgress;
 using Services.Input;
 using UnityEngine;
 
@@ -27,20 +28,21 @@ public class BootstrapState : IState
         _sceneLoader.Load(Initial, onLoaded: EnterLoadLevel);
     }
 
-    private void EnterLoadLevel() => _stateMachine.Enter<LoadLevelState, string>(Payload);
+    private void EnterLoadLevel() => _stateMachine.Enter<LoadProgressState>();
 
     private void RegisterServices()
     {
         _services.RegisterSingle<IInputService>(InputService());
-        _services.RegisterSingle<IAssets>(new AssetProvider());
-        var asset = _services.Single<IAssets>();
-        _services.RegisterSingle<IGameFactory>(new GameFactory(asset));
+        var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
+        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset));
+        var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
+        _services.RegisterSingle<ISaveLoadService>(new SaveLoadService(persistentProgress, gameFactory));
     }
 
     public void Exit()
     {
         
-    }
+    }   
     
     private static IInputService InputService()
     {
