@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Hero;
 using UnityEngine;
@@ -9,6 +10,8 @@ public class GameFactory : IGameFactory
     private readonly IAssets _assets;
     public List<ISavedProgressReader> ProgressReaders { get; } = new List<ISavedProgressReader>();
     public List<ISavedProgress> ProgressWriters { get; } = new List<ISavedProgress>();
+    public GameObject HeroGameObject { get; private set; }
+    public event Action HeroCreated;
 
     public GameFactory(IAssets assets)
     {
@@ -17,9 +20,10 @@ public class GameFactory : IGameFactory
 
     public GameObject CreateHero(GameObject at)
     {
-        var gameObject = InstantiateRegistered(AssetPath.HeroPath, at.transform.position);
-
-        return gameObject;
+        HeroGameObject = InstantiateRegistered(AssetPath.HeroPath, at.transform.position);
+        HeroCreated?.Invoke();
+         
+        return HeroGameObject;
     }
 
     public void CreateHub() => InstantiateRegistered(AssetPath.HudPath);

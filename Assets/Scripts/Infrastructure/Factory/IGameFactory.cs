@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Hero;
 using Infrastructure.Services;
@@ -7,10 +8,12 @@ namespace Infrastructure
 {
 public interface IGameFactory : IService
 {
-    GameObject CreateHero(GameObject at);
-    void CreateHub();
     List<ISavedProgressReader> ProgressReaders { get; }
     List<ISavedProgress> ProgressWriters { get; }
+    GameObject HeroGameObject { get; }
+    event Action HeroCreated;
+    GameObject CreateHero(GameObject at);
+    void CreateHub();
     void Cleanup();
 }
 }
