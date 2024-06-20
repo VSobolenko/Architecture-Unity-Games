@@ -2,6 +2,7 @@ using System;
 using Infrastructure.Services;
 using Infrastructure.Services.PersistentProgress;
 using Services.Input;
+using StaticData;
 using UnityEngine;
 
 namespace Infrastructure
@@ -33,10 +34,19 @@ public class BootstrapState : IState
     private void RegisterServices()
     {
         _services.RegisterSingle<IInputService>(InputService());
+        var staticDataService = RegisterStaticData();
         var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
-        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset));
+        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset, staticDataService));
         var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
         _services.RegisterSingle<ISaveLoadService>(new SaveLoadService(persistentProgress, gameFactory));
+    }
+
+    private IStaticDataService RegisterStaticData()
+    {
+        var staticDataService = _services.RegisterSingle<IStaticDataService>(new StaticDataService());
+        staticDataService.LoadMonsters();
+
+        return staticDataService;
     }
 
     public void Exit()

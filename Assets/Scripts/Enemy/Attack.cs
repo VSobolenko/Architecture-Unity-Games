@@ -1,8 +1,4 @@
-using System;
 using System.Linq;
-using Hero;
-using Infrastructure;
-using Infrastructure.Services;
 using UnityEngine;
 
 namespace Enemy
@@ -16,7 +12,6 @@ public class Attack : MonoBehaviour
     public float effectiveDistance = 0.5f;
     public float damage = 10f;
 
-    private IGameFactory _gameFactory;
     private Transform _heroTransform;
     private float _attackCooldown;
     private bool _isAttacking;
@@ -24,11 +19,11 @@ public class Attack : MonoBehaviour
     private Collider[] _hits =  new Collider[1];
     private bool _attackIsActive;
 
+    public void Construct(Transform heroTransform) => _heroTransform = heroTransform;
+
     private void Awake()
     {
-        _gameFactory = AllServices.Container.Single<IGameFactory>();
         _layerMask = 1 << LayerMask.NameToLayer("Player");
-        _gameFactory.HeroCreated += OnHeroCreated;
     }
 
     private void Update()
@@ -80,9 +75,7 @@ public class Attack : MonoBehaviour
     }
 
     private bool CooldownIsUp() => _attackCooldown <= 0;
-
-    private void OnHeroCreated() => _heroTransform = _gameFactory.HeroGameObject.transform;
-
+    
     public void EnableAttack()
     {
         _attackIsActive = true;

@@ -34,7 +34,7 @@ public class EnemyDeath : MonoBehaviour
 
     private void Die()
     {
-        enemyHealth.HealthChanged += HealthChanged;
+        enemyHealth.HealthChanged -= HealthChanged;
 
         enemyAnimator.PlayDeath();
         SpawnDeathFx();

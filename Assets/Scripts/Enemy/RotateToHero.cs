@@ -9,33 +9,15 @@ namespace Enemy
     public float speed;
 
     private Transform _heroTransform;
-    private IGameFactory _gameFactory;
     private Vector3 _positionToLook;
 
-    private void Start()
-    {
-      _gameFactory = AllServices.Container.Single<IGameFactory>();
-
-      if (IsHeroExist())
-        InitializeHeroTransform();
-      else
-        _gameFactory.HeroCreated += HeroCreated;
-    }
-
+    public void Construct(Transform heroTransform) => _heroTransform = heroTransform;
+    
     private void Update()
     {
       if (IsInitialized())
         RotateTowardsHero();
     }
-
-    private void OnDestroy()
-    {
-      if(_gameFactory != null)
-        _gameFactory.HeroCreated -= HeroCreated;
-    }
-
-    private bool IsHeroExist() => 
-      _gameFactory.HeroGameObject != null;
 
     private void RotateTowardsHero()
     {
@@ -61,11 +43,5 @@ namespace Enemy
 
     private bool IsInitialized() => 
       _heroTransform != null;
-    
-    private void HeroCreated() =>
-      InitializeHeroTransform();
-
-    private void InitializeHeroTransform() =>
-      _heroTransform = _gameFactory.HeroGameObject.transform;
   }
 }

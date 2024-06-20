@@ -11,21 +11,12 @@ public class ActorUI : MonoBehaviour
 
     public void Construct(IHealth health)
     {
-        if (health == null)
-            return;
         _heroHealth = health;
         _heroHealth.HealthChanged += UpdateHpBare;
     }
 
-    private void Awake()
-    {
-        Construct(GetComponent<IHealth>());
-    }
-
     private void OnDestroy()
     {
-        if (_heroHealth == null)
-            return;
         _heroHealth.HealthChanged -= UpdateHpBare;
     }
 

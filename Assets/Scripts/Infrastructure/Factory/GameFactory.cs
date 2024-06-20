@@ -1,32 +1,58 @@
-using System;
 using System.Collections.Generic;
+using Enemy;
 using Hero;
+using StaticData;
+using UI;
 using UnityEngine;
+using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 namespace Infrastructure
 {
 public class GameFactory : IGameFactory
 {
     private readonly IAssets _assets;
+    private readonly IStaticDataService _staticData;
     public List<ISavedProgressReader> ProgressReaders { get; } = new List<ISavedProgressReader>();
     public List<ISavedProgress> ProgressWriters { get; } = new List<ISavedProgress>();
-    public GameObject HeroGameObject { get; private set; }
-    public event Action HeroCreated;
+    private GameObject HeroGameObject { get; set; }
 
-    public GameFactory(IAssets assets)
+    public GameFactory(IAssets assets, IStaticDataService staticData)
     {
         _assets = assets;
+        _staticData = staticData;
     }
 
     public GameObject CreateHero(GameObject at)
     {
         HeroGameObject = InstantiateRegistered(AssetPath.HeroPath, at.transform.position);
-        HeroCreated?.Invoke();
          
         return HeroGameObject;
     }
 
     public GameObject CreateHud() => InstantiateRegistered(AssetPath.HudPath);
+
+    public GameObject CreateMonster(MonsterTypeId typeId, Transform parent)
+    {
+        var monsterData = _staticData.ForMonster(typeId);
+        var monster = Object.Instantiate(monsterData.prefab, parent.position, Quaternion.identity, parent);
+        var health = monster.GetComponent<IHealth>();
+        health.Current = monsterData.hp;
+        health.Max = monsterData.hp;
+        
+        monster.GetComponent<ActorUI>().Construct(health);
+        monster.GetComponent<AgentMoveToHero>().Construct(HeroGameObject.transform);
+        monster.GetComponent<NavMeshAgent>().speed = monsterData.moveSpeed;
+        monster.GetComponent<RotateToHero>()?.Construct(HeroGameObject.transform);
+
+        var attack = monster.GetComponent<Attack>();
+        attack.Construct(HeroGameObject.transform);
+        attack.damage = monsterData.damage;
+        attack.cleavage = monsterData.cleavage;
+        attack.effectiveDistance = monsterData.effectiveDistance;
+
+        return monster;
+    }
 
     public void Cleanup()
     {
@@ -41,7 +67,7 @@ public class GameFactory : IGameFactory
 
         return gameObject;
     }
-    
+
     private GameObject InstantiateRegistered(string prefabPath)
     {
         var gameObject = _assets.Instantiate(prefabPath);
