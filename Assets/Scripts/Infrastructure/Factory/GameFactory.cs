@@ -58,7 +58,7 @@ public class GameFactory : IGameFactory
         }
     }
 
-    private void Register(ISavedProgressReader progressReader)
+    public void Register(ISavedProgressReader progressReader)
     {
         if (progressReader is ISavedProgress progressWriter)
         {

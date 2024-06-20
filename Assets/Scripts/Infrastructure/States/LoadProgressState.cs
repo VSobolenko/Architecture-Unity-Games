@@ -20,7 +20,7 @@ public class LoadProgressState : IState
     public void Enter()
     {
         LoadProgressOnInit();
-        _gameStateMachine.Enter<LoadLevelState, string>(_progressService.Progress.worldData.positionOnLevel.level);
+        _gameStateMachine.Enter<LoadSceneState, string>(_progressService.Progress.worldData.positionOnLevel.level);
     }
 
     public void Exit()
