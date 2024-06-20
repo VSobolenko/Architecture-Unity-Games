@@ -1,7 +1,9 @@
 using System;
 using CameraLogic;
 using CodeBase.Logic;
+using Hero;
 using Infrastructure.Services.PersistentProgress;
+using UI;
 using UnityEngine;
 
 namespace Infrastructure
@@ -51,10 +53,23 @@ public class LoadLevelState : IPayloadedState<string>
 
     private void InitGameWorld()
     {
+        var hero = InitHero();
+        InitHud(hero);
+        CameraFollow(hero);
+    }
+
+    private GameObject InitHero()
+    {
         var initialPoint = GameObject.FindWithTag(tag: InitialPointTag);
         var hero = _gameFactory.CreateHero(at: initialPoint);
-        _gameFactory.CreateHub();
-        CameraFollow(hero);
+
+        return hero;
+    }
+
+    private void InitHud(GameObject hero)
+    {
+        var hud = _gameFactory.CreateHud();
+        hud.GetComponentInChildren<ActorUI>().Construct(hero.GetComponent<HeroHealth>());
     }
 
     private static void CameraFollow(GameObject hero)

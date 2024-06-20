@@ -20,7 +20,7 @@ public class LoadProgressState : IState
     public void Enter()
     {
         LoadProgressOnInit();
-        _gameStateMachine.Enter<LoadLevelState, string>(_progressService.Progress.WorldData.positionOnLevel.level);
+        _gameStateMachine.Enter<LoadLevelState, string>(_progressService.Progress.worldData.positionOnLevel.level);
     }
 
     public void Exit()
@@ -35,7 +35,22 @@ public class LoadProgressState : IState
 
     private PlayerProgress NewProgress()
     {
-        return new PlayerProgress("Main");
+        var progress = new PlayerProgress("Main")
+        {
+            heroState =
+            {
+                maxHp = 50,
+            },
+            heroStats =
+            {
+                damage = 1,
+                damageRadius = 1.5f,
+            }
+        };
+
+        progress.heroState.ResetHp();
+
+        return progress;
     }
 }
 }

@@ -26,7 +26,7 @@ public class GameFactory : IGameFactory
         return HeroGameObject;
     }
 
-    public void CreateHub() => InstantiateRegistered(AssetPath.HudPath);
+    public GameObject CreateHud() => InstantiateRegistered(AssetPath.HudPath);
 
     public void Cleanup()
     {

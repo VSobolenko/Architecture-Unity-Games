@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Hero;
 using Infrastructure;
 using Infrastructure.Services;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class Attack : MonoBehaviour
     public float cooldown = 3f;
     public float cleavage = 0.5f;
     public float effectiveDistance = 0.5f;
+    public float damage = 10f;
 
     private IGameFactory _gameFactory;
     private Transform _heroTransform;
@@ -42,6 +44,7 @@ public class Attack : MonoBehaviour
         if (Hit(out Collider hit))
         {
             PhysicsDebug.DrawDebug(StartPoint(), cleavage, 1);
+            hit.transform.GetComponent<IHealth>().TakeDamage(damage);
         }
     }
 

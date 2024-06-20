@@ -54,14 +54,14 @@ public class HeroMove : MonoBehaviour, ISavedProgress
 
     public void UpdateProgress(PlayerProgress progress)
     {
-        progress.WorldData.positionOnLevel = new PositionOnLevel(CurrentLevel(), transform.position.AsVectorData());
+        progress.worldData.positionOnLevel = new PositionOnLevel(CurrentLevel(), transform.position.AsVectorData());
     }
 
     public void LoadProgress(PlayerProgress progress)
     {
-        if (CurrentLevel() == progress.WorldData.positionOnLevel.level)
+        if (CurrentLevel() == progress.worldData.positionOnLevel.level)
         {
-            var savedPosition = progress.WorldData.positionOnLevel.position;
+            var savedPosition = progress.worldData.positionOnLevel.position;
             if (savedPosition != null)
                 Warp(savedPosition);
         }

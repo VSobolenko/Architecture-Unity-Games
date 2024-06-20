@@ -13,7 +13,7 @@ public interface IGameFactory : IService
     GameObject HeroGameObject { get; }
     event Action HeroCreated;
     GameObject CreateHero(GameObject at);
-    void CreateHub();
+    GameObject CreateHud();
     void Cleanup();
 }
 }

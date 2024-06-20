@@ -5,11 +5,15 @@ namespace Data
 [Serializable]
 public class PlayerProgress
 {
-    public WorldData WorldData;
+    public State heroState;
+    public WorldData worldData;
+    public Stats heroStats;
 
     public PlayerProgress(string initLevel)
     {
-        WorldData = new WorldData(initLevel);
+        worldData = new WorldData(initLevel);
+        heroState = new State();
+        heroStats = new Stats();
     }
 }
 }
