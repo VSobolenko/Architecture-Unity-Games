@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Enemy;
 using Hero;
+using Infrastructure.Services.PersistentProgress;
+using Infrastructure.Services.Randomizer;
 using StaticData;
 using UI;
 using UnityEngine;
@@ -13,24 +16,35 @@ public class GameFactory : IGameFactory
 {
     private readonly IAssets _assets;
     private readonly IStaticDataService _staticData;
+    private IRandomService _randomService;
+    private IPersistentProgressService _persistentProgressService;
     public List<ISavedProgressReader> ProgressReaders { get; } = new List<ISavedProgressReader>();
     public List<ISavedProgress> ProgressWriters { get; } = new List<ISavedProgress>();
     private GameObject HeroGameObject { get; set; }
 
-    public GameFactory(IAssets assets, IStaticDataService staticData)
+    public GameFactory(IAssets assets, IStaticDataService staticData, IRandomService randomService,
+                       IPersistentProgressService persistentProgressService)
     {
         _assets = assets;
         _staticData = staticData;
+        _randomService = randomService;
+        _persistentProgressService = persistentProgressService;
     }
 
     public GameObject CreateHero(GameObject at)
     {
         HeroGameObject = InstantiateRegistered(AssetPath.HeroPath, at.transform.position);
-         
+
         return HeroGameObject;
     }
 
-    public GameObject CreateHud() => InstantiateRegistered(AssetPath.HudPath);
+    public GameObject CreateHud()
+    {
+        var hud = InstantiateRegistered(AssetPath.HudPath);
+        hud.GetComponentInChildren<LootCounter>().Construct(_persistentProgressService.Progress.worldData);
+
+        return hud;
+    }
 
     public GameObject CreateMonster(MonsterTypeId typeId, Transform parent)
     {
@@ -39,11 +53,15 @@ public class GameFactory : IGameFactory
         var health = monster.GetComponent<IHealth>();
         health.Current = monsterData.hp;
         health.Max = monsterData.hp;
-        
+
         monster.GetComponent<ActorUI>().Construct(health);
         monster.GetComponent<AgentMoveToHero>().Construct(HeroGameObject.transform);
         monster.GetComponent<NavMeshAgent>().speed = monsterData.moveSpeed;
         monster.GetComponent<RotateToHero>()?.Construct(HeroGameObject.transform);
+
+        var lootSpawner = monster.GetComponentInChildren<LootSpawner>();
+        lootSpawner.Construct(this, _randomService);
+        lootSpawner.SetLoot(monsterData.minLoot, monsterData.maxLoot);
 
         var attack = monster.GetComponent<Attack>();
         attack.Construct(HeroGameObject.transform);
@@ -52,6 +70,14 @@ public class GameFactory : IGameFactory
         attack.effectiveDistance = monsterData.effectiveDistance;
 
         return monster;
+    }
+
+    public LootPiece CreateLoot()
+    {
+        var loot = InstantiateRegistered(AssetPath.Loot).GetComponent<LootPiece>();
+        loot.Construct(_persistentProgressService.Progress.worldData);
+
+        return loot;
     }
 
     public void Cleanup()

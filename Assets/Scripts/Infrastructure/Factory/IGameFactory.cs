@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Enemy;
 using Hero;
 using Infrastructure.Services;
 using Logic;
@@ -17,5 +18,6 @@ public interface IGameFactory : IService
     void Cleanup();
     void Register(ISavedProgressReader progressReader);
     GameObject CreateMonster(MonsterTypeId typeId, Transform parent);
+    LootPiece CreateLoot();
 }
 }

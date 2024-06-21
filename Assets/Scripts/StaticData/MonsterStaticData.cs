@@ -11,6 +11,9 @@ public class MonsterStaticData : ScriptableObject
 
     [Range(1, 30)] public int damage;
 
+    public int maxLoot;
+    public int minLoot;
+    
     [Range(0.5f, 1f)] public float effectiveDistance = 0.6f;
 
     [Range(0.5f, 1f)] public float cleavage;

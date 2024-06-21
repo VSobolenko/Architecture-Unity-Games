@@ -15,6 +15,8 @@ MonoBehaviour:
   monsterTypeId: 10
   hp: 11
   damage: 21
+  maxLoot: 2
+  minLoot: 5
   effectiveDistance: 0.6
   cleavage: 0.6
   moveSpeed: 4

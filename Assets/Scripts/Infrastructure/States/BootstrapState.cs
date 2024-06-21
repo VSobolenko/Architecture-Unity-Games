@@ -1,6 +1,7 @@
 using System;
 using Infrastructure.Services;
 using Infrastructure.Services.PersistentProgress;
+using Infrastructure.Services.Randomizer;
 using Services.Input;
 using StaticData;
 using UnityEngine;
@@ -34,10 +35,11 @@ public class BootstrapState : IState
     private void RegisterServices()
     {
         _services.RegisterSingle<IInputService>(InputService());
+        var randomService = _services.RegisterSingle<IRandomService>(new RandomService());
         var staticDataService = RegisterStaticData();
         var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
-        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset, staticDataService));
         var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
+        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset, staticDataService, randomService, persistentProgress));
         _services.RegisterSingle<ISaveLoadService>(new SaveLoadService(persistentProgress, gameFactory));
     }
 
