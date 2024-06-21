@@ -1,4 +1,3 @@
-using System;
 using Data;
 using Enemy;
 using Hero;
@@ -9,25 +8,24 @@ using UnityEngine;
 
 namespace Logic
 {
-public class EnemySpawner : MonoBehaviour, ISavedProgress
+public class SpawnPoint : MonoBehaviour, ISavedProgress
 {
     public MonsterTypeId monsterTypeId;
-    private string _id;
+    public string ID { get; set; }
 
-    public bool slain;
+    private bool _slain;
     private IGameFactory _factory;
     private EnemyDeath _enemyDeath;
 
-    private void Awake()
+    public void Construct(IGameFactory gameFactory)
     {
-        _id = GetComponent<UniqueId>().id;
-        _factory = AllServices.Container.Single<IGameFactory>();
+        _factory = gameFactory;
     }
 
     public void LoadProgress(PlayerProgress progress)
     {
-        if (progress.killData.clearedSpawners.Contains(_id))
-            slain = true;
+        if (progress.killData.clearedSpawners.Contains(ID))
+            _slain = true;
         else
             Spawn();
     }
@@ -42,13 +40,13 @@ public class EnemySpawner : MonoBehaviour, ISavedProgress
     private void Slay()
     {
         if (_enemyDeath is not null) _enemyDeath.Happened -= Slay;
-        slain = true;
+        _slain = true;
     }
 
     public void UpdateProgress(PlayerProgress progress)
     {
-        if (slain)
-            progress.killData.clearedSpawners.Add(_id);
+        if (_slain)
+            progress.killData.clearedSpawners.Add(ID);
     }
 }
 }

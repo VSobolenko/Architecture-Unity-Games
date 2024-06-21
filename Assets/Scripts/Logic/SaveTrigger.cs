@@ -11,7 +11,7 @@ public class SaveTrigger : MonoBehaviour
     private ISaveLoadService _saveLoadService;
 
     public BoxCollider boxCollider;
-    
+
     private void Awake()
     {
         _saveLoadService = AllServices.Container.Single<ISaveLoadService>();

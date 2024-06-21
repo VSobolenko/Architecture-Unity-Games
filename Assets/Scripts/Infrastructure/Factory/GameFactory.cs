@@ -4,6 +4,7 @@ using Enemy;
 using Hero;
 using Infrastructure.Services.PersistentProgress;
 using Infrastructure.Services.Randomizer;
+using Logic;
 using StaticData;
 using UI;
 using UnityEngine;
@@ -78,6 +79,16 @@ public class GameFactory : IGameFactory
         loot.Construct(_persistentProgressService.Progress.worldData);
 
         return loot;
+    }
+
+    public void CreateSpawner(Vector3 at, string spawnerId, MonsterTypeId monsterTypeId)
+    {
+        var spawner = InstantiateRegistered(AssetPath.Spawner, at)
+            .GetComponent<SpawnPoint>();
+
+        spawner.ID = spawnerId;
+        spawner.monsterTypeId = monsterTypeId;
+        spawner.Construct(this);
     }
 
     public void Cleanup()
