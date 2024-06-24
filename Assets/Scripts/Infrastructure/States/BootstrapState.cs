@@ -1,5 +1,6 @@
 using System;
 using Infrastructure.Services;
+using Infrastructure.Services.Ads;
 using Infrastructure.Services.PersistentProgress;
 using Infrastructure.Services.Randomizer;
 using Services.Input;
@@ -36,6 +37,8 @@ public class BootstrapState : IState
     {
         _services.RegisterSingle<IInputService>(InputService());
         var randomService = _services.RegisterSingle<IRandomService>(new RandomService());
+        var ads = _services.RegisterSingle<IAdsService>(new AdsService());
+        ads.Initialize();
         var staticDataService = RegisterStaticData();
         var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
         var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());

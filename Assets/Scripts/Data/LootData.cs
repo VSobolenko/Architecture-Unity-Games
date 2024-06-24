@@ -13,5 +13,11 @@ public class LootData
         collected += loot.value;
         changed?.Invoke();
     }
+
+    public void Add(int count)
+    {
+        collected += count;
+        changed?.Invoke();
+    }
 }
 }
