@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Enemy;
 using Hero;
@@ -7,6 +6,8 @@ using Infrastructure.Services.Randomizer;
 using Logic;
 using StaticData;
 using UI;
+using UI.Elements;
+using UI.Services;
 using UnityEngine;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -17,19 +18,21 @@ public class GameFactory : IGameFactory
 {
     private readonly IAssets _assets;
     private readonly IStaticDataService _staticData;
-    private IRandomService _randomService;
-    private IPersistentProgressService _persistentProgressService;
+    private readonly IRandomService _randomService;
+    private readonly IPersistentProgressService _persistentProgressService;
+    private readonly IWindowsService _windowServices;
     public List<ISavedProgressReader> ProgressReaders { get; } = new List<ISavedProgressReader>();
     public List<ISavedProgress> ProgressWriters { get; } = new List<ISavedProgress>();
     private GameObject HeroGameObject { get; set; }
 
     public GameFactory(IAssets assets, IStaticDataService staticData, IRandomService randomService,
-                       IPersistentProgressService persistentProgressService)
+                       IPersistentProgressService persistentProgressService, IWindowsService windowServices)
     {
         _assets = assets;
         _staticData = staticData;
         _randomService = randomService;
         _persistentProgressService = persistentProgressService;
+        _windowServices = windowServices;
     }
 
     public GameObject CreateHero(GameObject at)
@@ -44,6 +47,10 @@ public class GameFactory : IGameFactory
         var hud = InstantiateRegistered(AssetPath.HudPath);
         hud.GetComponentInChildren<LootCounter>().Construct(_persistentProgressService.Progress.worldData);
 
+        foreach (var openWindowButton in hud.GetComponentsInChildren<OpenWindowButton>())
+        {
+            openWindowButton.Construct(_windowServices);
+        }
         return hud;
     }
 

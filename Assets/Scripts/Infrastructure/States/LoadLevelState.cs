@@ -6,24 +6,25 @@ using Infrastructure.Services.PersistentProgress;
 using Logic;
 using StaticData;
 using UI;
+using UI.Services;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Infrastructure
 {
-public class LoadSceneState : IPayloadedState<string>
+public class LoadLevelState : IPayloadedState<string>
 {
     private const string InitialPointTag = "InitialPoint";
-    private const string EnemySpawnerTag = "EnemySpawner";
     private readonly GameStateMachine _gameStateMachine;
     private readonly SceneLoader _sceneLoader;
     private readonly LoadingCurtain _loadingCurtain;
     private readonly IGameFactory _gameFactory;
     private readonly IPersistentProgressService _persistentProgressService;
-    private IStaticDataService _staticData;
+    private readonly IStaticDataService _staticData;
+    private readonly IUIFactory _uiFactory;
 
-    public LoadSceneState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, LoadingCurtain loadingCurtain,
-                          IGameFactory gameFactory, IPersistentProgressService persistentProgressService, IStaticDataService staticData)
+    public LoadLevelState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, LoadingCurtain loadingCurtain,
+                          IGameFactory gameFactory, IPersistentProgressService persistentProgressService, IStaticDataService staticData, IUIFactory uiFactory)
     {
         _gameStateMachine = gameStateMachine;
         _sceneLoader = sceneLoader;
@@ -31,6 +32,7 @@ public class LoadSceneState : IPayloadedState<string>
         _gameFactory = gameFactory;
         _persistentProgressService = persistentProgressService;
         _staticData = staticData;
+        _uiFactory = uiFactory;
     }
 
     public void Enter(string sceneName)
@@ -44,9 +46,15 @@ public class LoadSceneState : IPayloadedState<string>
 
     private void OnLoaded()
     {
+        InitUIRoot();   
         InitGameWorld();
         InformProgressReaders();
         _gameStateMachine.Enter<GameLoopState>();
+    }
+
+    private void InitUIRoot()
+    {
+        _uiFactory.CreateUIRoot();
     }
 
     private void InformProgressReaders()

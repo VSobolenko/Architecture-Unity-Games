@@ -4,6 +4,7 @@ using CodeBase.Logic;
 using Infrastructure.Services;
 using Infrastructure.Services.PersistentProgress;
 using StaticData;
+using UI.Services;
 using UnityEngine;
 
 namespace Infrastructure
@@ -17,11 +18,19 @@ public class GameStateMachine
     {
         _states = new Dictionary<Type, IExitable>
         {
-            [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader, services),
-            [typeof(LoadSceneState)] =
-                new LoadSceneState(this, sceneLoader, loadingCurtain, services.Single<IGameFactory>(),
-                                   services.Single<IPersistentProgressService>(), services.Single<IStaticDataService>()),
-            [typeof(LoadProgressState)] = new LoadProgressState(this, services.Single<IPersistentProgressService>(),
+            [typeof(BootstrapState)] = new BootstrapState(this, 
+                                                          sceneLoader, 
+                                                          services),
+            [typeof(LoadLevelState)] =
+                new LoadLevelState(this, 
+                                   sceneLoader, 
+                                   loadingCurtain, 
+                                   services.Single<IGameFactory>(),
+                                   services.Single<IPersistentProgressService>(), 
+                                   services.Single<IStaticDataService>(),
+                                   services.Single<IUIFactory>()),
+            [typeof(LoadProgressState)] = new LoadProgressState(this, 
+                                                                services.Single<IPersistentProgressService>(),
                                                                 services.Single<ISaveLoadService>()),
             [typeof(GameLoopState)] = new GameLoopState(this),
         };
