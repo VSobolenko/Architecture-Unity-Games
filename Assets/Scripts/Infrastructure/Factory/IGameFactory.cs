@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Enemy;
 using Hero;
 using Infrastructure.Services;
@@ -13,11 +14,12 @@ public interface IGameFactory : IService
 {
     List<ISavedProgressReader> ProgressReaders { get; }
     List<ISavedProgress> ProgressWriters { get; }
-    GameObject CreateHero(GameObject at);
-    GameObject CreateHud();
+    Task<GameObject> CreateHero(Vector3 at);
+    Task<GameObject> CreateHud();
     void Cleanup();
-    GameObject CreateMonster(MonsterTypeId typeId, Transform parent);
-    LootPiece CreateLoot();
-    void CreateSpawner(Vector3 at, string spawnerId, MonsterTypeId monsterTypeId);
+    Task<GameObject> CreateMonster(MonsterTypeId typeId, Transform parent);
+    Task<LootPiece> CreateLoot();
+    Task CreateSpawner(Vector3 at, string spawnerId, MonsterTypeId monsterTypeId);
+    Task WarmUp();
 }
 }

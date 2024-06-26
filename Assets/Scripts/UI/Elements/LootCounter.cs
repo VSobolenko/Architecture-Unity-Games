@@ -14,13 +14,10 @@ public class LootCounter : MonoBehaviour
     {
         _worldData = worldData;
         _worldData.lootData.changed += UpdateCounter;
-    }
 
-    private void Start()
-    {
         UpdateCounter();
     }
-
+    
     private void UpdateCounter()
     {
         counter.text = $"{_worldData.lootData.collected}";

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using CameraLogic;
 using CodeBase.Logic;
 using Hero;
@@ -14,7 +15,6 @@ namespace Infrastructure
 {
 public class LoadLevelState : IPayloadedState<string>
 {
-    private const string InitialPointTag = "InitialPoint";
     private readonly GameStateMachine _gameStateMachine;
     private readonly SceneLoader _sceneLoader;
     private readonly LoadingCurtain _loadingCurtain;
@@ -24,7 +24,8 @@ public class LoadLevelState : IPayloadedState<string>
     private readonly IUIFactory _uiFactory;
 
     public LoadLevelState(GameStateMachine gameStateMachine, SceneLoader sceneLoader, LoadingCurtain loadingCurtain,
-                          IGameFactory gameFactory, IPersistentProgressService persistentProgressService, IStaticDataService staticData, IUIFactory uiFactory)
+                          IGameFactory gameFactory, IPersistentProgressService persistentProgressService,
+                          IStaticDataService staticData, IUIFactory uiFactory)
     {
         _gameStateMachine = gameStateMachine;
         _sceneLoader = sceneLoader;
@@ -39,22 +40,23 @@ public class LoadLevelState : IPayloadedState<string>
     {
         _loadingCurtain.Show();
         _gameFactory.Cleanup();
-        _sceneLoader.Load(sceneName, onLoaded: OnLoaded);
+        _gameFactory.WarmUp();
+        _sceneLoader.Load(sceneName, OnLoaded);
     }
 
     public void Exit() => _loadingCurtain.Hide();
 
-    private void OnLoaded()
+    private async void OnLoaded()
     {
-        InitUIRoot();   
-        InitGameWorld();
+        await InitUIRoot();
+        await InitGameWorld();
         InformProgressReaders();
         _gameStateMachine.Enter<GameLoopState>();
     }
 
-    private void InitUIRoot()
+    private async Task InitUIRoot()
     {
-        _uiFactory.CreateUIRoot();
+        await _uiFactory.CreateUIRoot();
     }
 
     private void InformProgressReaders()
@@ -65,35 +67,38 @@ public class LoadLevelState : IPayloadedState<string>
         }
     }
 
-    private void InitGameWorld()
+    private async Task InitGameWorld()
     {
-        InitSpawners();
-        var hero = InitHero();
-        InitHud(hero);
+        var levelData = LevelStaticData();
+
+        InitSpawners(levelData);
+        var hero = await InitHero(levelData);
+        await InitHud(hero);
         CameraFollow(hero);
     }
 
-    private void InitSpawners()
+    private void InitSpawners(LevelStaticData levelData)
     {
-        string sceneKey = SceneManager.GetActiveScene().name;
-        var levelData = _staticData.ForLevel(sceneKey);
         foreach (var spawnerData in levelData.enemySpawners)
         {
             _gameFactory.CreateSpawner(spawnerData.position, spawnerData.id, spawnerData.monsterTypeId);
         }
     }
 
-    private GameObject InitHero()
+    private LevelStaticData LevelStaticData()
     {
-        var initialPoint = GameObject.FindWithTag(tag: InitialPointTag);
-        var hero = _gameFactory.CreateHero(at: initialPoint);
+        string sceneKey = SceneManager.GetActiveScene().name;
+        var levelData = _staticData.ForLevel(sceneKey);
 
-        return hero;
+        return levelData;
     }
 
-    private void InitHud(GameObject hero)
+    private async Task<GameObject> InitHero(LevelStaticData levelData) =>
+        await _gameFactory.CreateHero(at: levelData.initialHeroPosition);
+
+    private async Task InitHud(GameObject hero)
     {
-        var hud = _gameFactory.CreateHud();
+        var hud = await _gameFactory.CreateHud();
         hud.GetComponentInChildren<ActorUI>().Construct(hero.GetComponent<HeroHealth>());
     }
 

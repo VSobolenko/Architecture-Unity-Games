@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Infrastructure
 {
-public class GameStateMachine
+public class GameStateMachine : IGameStateMachine
 {
     private Dictionary<Type, IExitable> _states;
     private IExitable _activeState;

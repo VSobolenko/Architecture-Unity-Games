@@ -22,7 +22,7 @@ public class BootstrapState : IState
         _stateMachine = stateMachine;
         _sceneLoader = sceneLoader;
         _services = services;
-        
+
         RegisterServices();
     }
 
@@ -36,16 +36,28 @@ public class BootstrapState : IState
     private void RegisterServices()
     {
         _services.RegisterSingle<IInputService>(InputService());
+        _services.RegisterSingle<IGameStateMachine>(_stateMachine);
         var randomService = _services.RegisterSingle<IRandomService>(new RandomService());
         var ads = _services.RegisterSingle<IAdsService>(new AdsService());
         ads.Initialize();
         var staticDataService = RegisterStaticData();
-        var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
+        var asset = RegisterAssetProvider();
         var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
-        var uiFactory = _services.RegisterSingle<IUIFactory>(new UIFactory(asset, staticDataService, persistentProgress));
+        var uiFactory =
+            _services.RegisterSingle<IUIFactory>(new UIFactory(asset, staticDataService, persistentProgress));
         var windowService = _services.RegisterSingle<IWindowsService>(new WindowsService(uiFactory));
-        var gameFactory = _services.RegisterSingle<IGameFactory>(new GameFactory(asset, staticDataService, randomService, persistentProgress, windowService));
+        var gameFactory =
+            _services.RegisterSingle<IGameFactory>(
+                new GameFactory(asset, staticDataService, randomService, persistentProgress, windowService));
         _services.RegisterSingle<ISaveLoadService>(new SaveLoadService(persistentProgress, gameFactory));
+    }
+
+    private IAssets RegisterAssetProvider()
+    {
+        var asset = _services.RegisterSingle<IAssets>(new AssetProvider());
+        asset.Initialize();
+
+        return asset;
     }
 
     private IStaticDataService RegisterStaticData()
@@ -58,9 +70,8 @@ public class BootstrapState : IState
 
     public void Exit()
     {
-        
-    }   
-    
+    }
+
     private static IInputService InputService()
     {
         if (Application.isEditor)

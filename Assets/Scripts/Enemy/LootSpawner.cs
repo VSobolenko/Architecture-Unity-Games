@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Data;
 using Infrastructure;
 using Infrastructure.Services.Randomizer;
@@ -24,9 +25,9 @@ public class LootSpawner : MonoBehaviour
         enemyDeath.Happened += SpawnLoot;
     }
 
-    private void SpawnLoot()
+    private async void SpawnLoot()
     {
-        LootPiece loot = _factory.CreateLoot();
+        LootPiece loot = await _factory.CreateLoot();
         loot.transform.position = transform.position;
         
         var lootItem = GenerateLoot();

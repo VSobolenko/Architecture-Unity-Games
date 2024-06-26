@@ -10,6 +10,8 @@ namespace GameEditor
 [CustomEditor(typeof(LevelStaticData))]
 public class LevelStaticDataEditor : Editor
 {
+    private const string InitialPointTag = "InitialPoint";
+    
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -25,6 +27,8 @@ public class LevelStaticDataEditor : Editor
                     .ToList();
 
             levelData.levelKey = SceneManager.GetActiveScene().name;
+            
+            levelData.initialHeroPosition = GameObject.FindWithTag(tag: InitialPointTag).transform.position;
         }
 
         EditorUtility.SetDirty(target);

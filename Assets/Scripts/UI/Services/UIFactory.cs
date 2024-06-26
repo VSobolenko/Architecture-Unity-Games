@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Infrastructure;
 using Infrastructure.Services.PersistentProgress;
 using StaticData;
@@ -7,7 +8,6 @@ namespace UI.Services
 {
 internal class UIFactory : IUIFactory
 {
-    private const string UIRootPath = "UI/UIRoot";
     private readonly IAssets _assets;
     private readonly IStaticDataService _staticData;
     private Transform _uiRoot;
@@ -28,9 +28,10 @@ internal class UIFactory : IUIFactory
         return shop.gameObject;
     }
 
-    public void CreateUIRoot()
+    public async Task CreateUIRoot()
     {
-        _uiRoot = _assets.Instantiate(UIRootPath).transform;
+        var root = await _assets.Instantiate(AssetAddress.UIRootPath);
+        _uiRoot = root.transform;
     }
 }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Data;
 using Enemy;
 using Hero;
@@ -30,9 +31,9 @@ public class SpawnPoint : MonoBehaviour, ISavedProgress
             Spawn();
     }
 
-    private void Spawn()
+    private async Task Spawn()
     {
-        var monster = _factory.CreateMonster(monsterTypeId, transform);
+        var monster = await _factory.CreateMonster(monsterTypeId, transform);
         _enemyDeath = monster.GetComponent<EnemyDeath>();
         _enemyDeath.Happened += Slay;
     }

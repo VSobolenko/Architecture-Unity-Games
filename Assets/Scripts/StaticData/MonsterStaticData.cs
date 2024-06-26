@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace StaticData
 {
@@ -20,6 +21,6 @@ public class MonsterStaticData : ScriptableObject
 
     [Range(0f, 10f)] public float moveSpeed = 4f;
 
-    public GameObject prefab;
+    public AssetReferenceGameObject prefabReference;
 }
 }

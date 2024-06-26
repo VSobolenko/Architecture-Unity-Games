@@ -10,5 +10,7 @@ public class LevelStaticData : ScriptableObject
     public string levelKey;
 
     public List<EnemySpawnerData> enemySpawners;
+
+    public Vector3 initialHeroPosition;
 }
 }
