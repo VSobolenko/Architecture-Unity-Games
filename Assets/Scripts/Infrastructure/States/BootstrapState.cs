@@ -1,6 +1,7 @@
 using System;
 using Infrastructure.Services;
 using Infrastructure.Services.Ads;
+using Infrastructure.Services.IAP;
 using Infrastructure.Services.PersistentProgress;
 using Infrastructure.Services.Randomizer;
 using Services.Input;
@@ -38,18 +39,36 @@ public class BootstrapState : IState
         _services.RegisterSingle<IInputService>(InputService());
         _services.RegisterSingle<IGameStateMachine>(_stateMachine);
         var randomService = _services.RegisterSingle<IRandomService>(new RandomService());
-        var ads = _services.RegisterSingle<IAdsService>(new AdsService());
-        ads.Initialize();
+        var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
+        var iapProvider = new IAPProvider();
+        var adsService = RegisterAds();
+        var iapService = RegisterIAP(persistentProgress, iapProvider);
         var staticDataService = RegisterStaticData();
         var asset = RegisterAssetProvider();
-        var persistentProgress = _services.RegisterSingle<IPersistentProgressService>(new PersistentProgressService());
         var uiFactory =
-            _services.RegisterSingle<IUIFactory>(new UIFactory(asset, staticDataService, persistentProgress));
+            _services.RegisterSingle<IUIFactory>(
+                new UIFactory(asset, staticDataService, persistentProgress, iapService, adsService));
         var windowService = _services.RegisterSingle<IWindowsService>(new WindowsService(uiFactory));
         var gameFactory =
             _services.RegisterSingle<IGameFactory>(
                 new GameFactory(asset, staticDataService, randomService, persistentProgress, windowService));
         _services.RegisterSingle<ISaveLoadService>(new SaveLoadService(persistentProgress, gameFactory));
+    }
+
+    private IAdsService RegisterAds()
+    {
+        var ads = _services.RegisterSingle<IAdsService>(new AdsService());
+        ads.Initialize();
+
+        return ads;
+    }
+
+    private IIAPService RegisterIAP(IPersistentProgressService progressService, IAPProvider iapProvider)
+    {
+        var iap = _services.RegisterSingle<IIAPService>(new IAPService(iapProvider, progressService));
+        iap.Initialize();
+
+        return iap;
     }
 
     private IAssets RegisterAssetProvider()

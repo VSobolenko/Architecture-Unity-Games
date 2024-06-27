@@ -7,5 +7,6 @@ public static class AssetAddress
     public const string Loot = "Loot";
     public const string Spawner = "SpawnPoint";
     public const string UIRootPath = "UIRoot";
+    public const string ShopItemPath = "ShopItem";
 }
 }

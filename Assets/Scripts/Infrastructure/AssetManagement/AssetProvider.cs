@@ -17,7 +17,7 @@ public class AssetProvider : IAssets
     {
         Addressables.InitializeAsync();
     }
-    
+
     public async Task<T> Load<T>(AssetReference assetReference) where T : class
     {
         if (_completeCache.TryGetValue(assetReference.AssetGUID, out var completeHandle))
@@ -42,6 +42,11 @@ public class AssetProvider : IAssets
     public Task<GameObject> Instantiate(string address, Vector3 at)
     {
         return Addressables.InstantiateAsync(address, at, Quaternion.identity).Task;
+    }
+
+    public Task<GameObject> Instantiate(string address, Transform under)
+    {
+        return Addressables.InstantiateAsync(address, under).Task;
     }
 
     private async Task<T> RunWithCacheOnComplete<T>(AsyncOperationHandle<T> handle, string cacheKey) where T : class

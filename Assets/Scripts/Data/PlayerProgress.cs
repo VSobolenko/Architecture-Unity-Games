@@ -9,6 +9,7 @@ public class PlayerProgress
     public WorldData worldData;
     public Stats heroStats;
     public KillData killData;
+    public PurchaseData purchaseData;
 
     public PlayerProgress(string initLevel)
     {
@@ -16,6 +17,7 @@ public class PlayerProgress
         heroState = new State();
         heroStats = new Stats();
         killData = new KillData();
+        purchaseData = new PurchaseData();
     }
     }
 }
